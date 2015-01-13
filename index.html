@@ -1,0 +1,170 @@
+<html>
+<head>
+  <title>YouTube Live Gaming Player</title>
+  
+  <style>
+    body, div, iframe {
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-size: 50px;
+      font-family: sans-serif;
+      color: white;
+      font-weight: bold;
+      background-color: black;
+			text-shadow: 0px 0px 30px #000;
+    }
+    
+    #livebadge {
+      position: absolute;
+      top: 25px;
+      left: 20px;
+      border: 6px solid red;
+      padding: 10px;
+      padding-top: 2px;
+      padding-bottom: 2px;
+			opacity: 0.7;
+    }
+    
+    #title {
+      position: absolute;
+      top: 23px;
+      left: 180px;
+      height: 50px;
+      overflow: hidden;
+      margin-right: 15px;
+      font-size: 40px;
+    }
+    
+    #author {
+      position: absolute;
+      top: 70px;
+      left: 182px;
+      height: 30px;
+      font-size: 24px;
+      color: #bbb;
+    }
+  </style>
+</head>
+<body>
+  <div id="livebadge">LIVE</div>
+  <div id="title"></div>
+  <div id="author"></div>
+  <div id="player"></div>
+  
+  <script>
+    var pageHeight = Math.max(
+      document.body.scrollHeight, document.documentElement.scrollHeight,
+      document.body.offsetHeight, document.documentElement.offsetHeight,
+      document.body.clientHeight, document.documentElement.clientHeight
+    );
+    var pageWidth = Math.max(
+      document.body.scrollWidth, document.documentElement.scrollWidth,
+      document.body.offsetWidth, document.documentElement.offsetWidth,
+      document.body.clientWidth, document.documentElement.clientWidth
+    );
+    
+    //Refresh the page every once in a long while
+    setTimeout(function() {
+      location.reload(true);
+    }, 86400000);
+
+    var tag = document.createElement('script');
+  
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
+    var player;
+		var PLAYLIST_ID = "PLiCvVJzBupKmEehQ3hnNbbfBjLUyvGlqx";
+    
+    function onYouTubeIframeAPIReady() {
+      setupPlayer();
+    }
+    
+    function setupPlayer() {
+      player = new YT.Player('player', {
+        height: pageHeight,
+        width: pageWidth,
+        playerVars: {
+          listType: 'playlist',
+          list: PLAYLIST_ID,
+          controls: 0
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange,
+          'onError': onError
+        }
+      });
+    }
+    
+    //Update metadata about currently playing video
+    function updateMetadata() {
+      document.getElementById("title").innerText = player.getVideoData().title;
+      document.getElementById("author").innerText = player.getVideoData().author;
+    }
+    
+    function reloadPlaylist() {
+      console.log("Reloading playlist.");
+      
+      player.loadPlaylist({'list': PLAYLIST_ID, 'listType': 'playlist'});
+      
+      setTimeout(reloadPlaylist, 3600000);
+    }
+    
+    function nextVideo() {
+      console.log("Skipping to next video.");
+      
+      player.nextVideo();
+    }
+    
+    //Refresh the playlist every once in a short while
+    setTimeout(reloadPlaylist, 3600000);
+    
+		//Skip on button press
+		window.onkeypress = function(e) {
+			var key = e.keyCode ? e.keyCode : e.which;
+			//The BIG RED BUTTON outputs a lower-case 'x'
+			if(key == 120) {
+        var listLen = player.getPlaylist().length;
+        
+        //If we got to the end, refresh the playlist
+        if(player.getPlaylistIndex() >= listLen - 1) {
+          reloadPlaylist();
+        }
+        //Otherwise, just skip ahead
+        else {
+          nextVideo();
+        }
+			}
+		}
+
+    function onPlayerReady(event) {
+      event.target.playVideo();
+    }
+    
+    function onPlayerStateChange(event) {
+      console.log("PlayerState: " + event.data);
+      
+      updateMetadata();
+      
+      //If the video finishes, reload the playlist
+      if(event.data == YT.PlayerState.ENDED) {
+        console.log("Live stream ended. Reloading playlist.")
+        
+        reloadPlaylist();
+      }
+    }
+    
+    function onError(event) {
+      console.log("Error: " + event.data);
+      console.log("Playback problem. Skipping to next video.");
+      
+      nextVideo();
+    }
+  </script>
+</body>
+</html>
