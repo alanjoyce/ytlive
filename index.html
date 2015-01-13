@@ -141,15 +141,15 @@
         if(typeof viewcount == 'undefined') {
       	  viewcount = '?';
         }
-        return viewcount;
+        document.getElementById("author").innerText = player.getVideoData().author + " / " + viewcount + " watching";
       });
     }
     
     //Update metadata about currently playing video
     function updateMetadata() {
       document.getElementById("title").innerText = player.getVideoData().title;
-      var viewcount = getViewcount(player.getVideoData().video_id);
-      document.getElementById("author").innerText = player.getVideoData().author + " / " + viewcount + " watching";
+      document.getElementById("author").innerText = player.getVideoData().author;
+      getViewcount(player.getVideoData().video_id);
     }
     
     function reloadPlaylist() {
