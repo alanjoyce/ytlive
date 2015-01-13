@@ -81,12 +81,8 @@
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     
     var player;
-    //EVERYTHING
-    //var PLAYLIST_ID = "PLiCvVJzBupKmEehQ3hnNbbfBjLUyvGlqx";
-	  //MINECRAFT
-	  var PLAYLIST_ID = "PLZKuf2oBY67hyDlNycziuY8y58fZvncBp";
-    //LEAGUE OF LEGENDS
-    //var PLAYLIST_ID = "PLLbJ27RDXU830wzgieQn1JTs97mGuBIc6";
+    var playlists = Array("PLiCvVJzBupKmEehQ3hnNbbfBjLUyvGlqx", "PLZKuf2oBY67hyDlNycziuY8y58fZvncBp", "PLLbJ27RDXU830wzgieQn1JTs97mGuBIc6");
+    var currentPlaylist = 0;
     
     function onYouTubeIframeAPIReady() {
       //API stuff
@@ -146,7 +142,7 @@
     function reloadPlaylist() {
       console.log("Reloading playlist.");
       
-      player.loadPlaylist({'list': PLAYLIST_ID, 'listType': 'playlist'});
+      player.loadPlaylist({'list': currentPlaylist, 'listType': 'playlist'});
       
       setTimeout(reloadPlaylist, 3600000);
     }
@@ -169,6 +165,9 @@
         
         //If we got to the end, refresh the playlist
         if(player.getPlaylistIndex() >= listLen - 1) {
+          //Also, choose a random new playlist
+          currentPlaylist = Math.floor(Math.random()*playlists.length);
+          
           reloadPlaylist();
         }
         //Otherwise, just skip ahead
