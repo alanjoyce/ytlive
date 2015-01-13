@@ -46,12 +46,24 @@
       font-size: 24px;
       color: #bbb;
     }
+    
+    #viewcount {
+      position: absolute;
+      top: 100px;
+      left: 182px;
+      height: 30px;
+      font-size: 24px;
+      color: #bbb;
+    }
   </style>
+  
+  <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
 </head>
 <body>
   <div id="livebadge">LIVE</div>
   <div id="title"></div>
   <div id="author"></div>
+  <div id="viewcount"></div>
   <div id="player"></div>
   
   <script>
@@ -78,9 +90,18 @@
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     
     var player;
-		var PLAYLIST_ID = "PLiCvVJzBupKmEehQ3hnNbbfBjLUyvGlqx";
+		//var PLAYLIST_ID = "PLiCvVJzBupKmEehQ3hnNbbfBjLUyvGlqx";
+    var PLAYLIST_ID = "PLZKuf2oBY67hyDlNycziuY8y58fZvncBp";
     
     function onYouTubeIframeAPIReady() {
+      //API stuff
+      var apiKey = 'AIzaSyCNKKxkfcuJG9UkijDfkZD0N0K7Kw_f35A';
+      
+      gapi.client.setApiKey(apiKey);
+      gapi.client.load('youtube', 'v3', function() {
+        console.log("API loaded");
+      });
+      
       setupPlayer();
     }
     
@@ -101,10 +122,23 @@
       });
     }
     
+    function updateViewcount(videoID) {
+      var request = gapi.client.youtube.videos.list({
+        id: videoID,
+        part: 'liveStreamingDetails',
+      });
+      request.execute(function(response) {
+        console.log(response);
+        var viewcount = response.items[0].liveStreamingDetails.concurrentViewers;
+        document.getElementById("viewcount").innerText = viewcount;
+      });
+    }
+    
     //Update metadata about currently playing video
     function updateMetadata() {
       document.getElementById("title").innerText = player.getVideoData().title;
       document.getElementById("author").innerText = player.getVideoData().author;
+      updateViewcount(player.getVideoData().video_id);
     }
     
     function reloadPlaylist() {
