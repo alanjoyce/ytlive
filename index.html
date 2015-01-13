@@ -142,7 +142,7 @@
     function reloadPlaylist() {
       console.log("Reloading playlist.");
       
-      player.loadPlaylist({'list': currentPlaylist, 'listType': 'playlist'});
+      player.loadPlaylist({'list': playlists[currentPlaylist], 'listType': 'playlist'});
       
       setTimeout(reloadPlaylist, 3600000);
     }
