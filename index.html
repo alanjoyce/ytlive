@@ -102,6 +102,8 @@
         console.log("API loaded");
         setupPlayer();
       });
+      
+      setInterval(updateMetadata, 60000);
     }
     
     function setupPlayer() {
@@ -122,15 +124,18 @@
     }
     
     function updateViewcount(videoID) {
-      var request = gapi.client.youtube.videos.list({
-        id: videoID,
-        part: 'liveStreamingDetails',
-      });
-      request.execute(function(response) {
-        console.log(response);
-        var viewcount = response.items[0].liveStreamingDetails.concurrentViewers;
-        document.getElementById("viewcount").innerText = viewcount;
-      });
+      var viewcount = "0";
+      if(videoID) {
+        var request = gapi.client.youtube.videos.list({
+          id: videoID,
+          part: 'liveStreamingDetails',
+        });
+        request.execute(function(response) {
+          console.log(response);
+          var viewcount = response.items[0].liveStreamingDetails.concurrentViewers;
+          document.getElementById("viewcount").innerText = viewcount + " watching";
+        });
+      }
     }
     
     //Update metadata about currently playing video
