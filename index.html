@@ -138,8 +138,8 @@
       request.execute(function(response) {
         console.log(response);
         var viewcount = response.items[0].liveStreamingDetails.concurrentViewers;
-        if(!viewcount) {
-      	  viewcount = 0;
+        if(typeof viewcount == 'undefined') {
+      	  viewcount = '?';
         }
         return viewcount;
       });
