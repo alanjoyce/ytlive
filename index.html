@@ -123,26 +123,28 @@
       });
     }
     
-    function updateViewcount(videoID) {
-      var viewcount = "0";
-      if(videoID) {
-        var request = gapi.client.youtube.videos.list({
-          id: videoID,
-          part: 'liveStreamingDetails',
-        });
-        request.execute(function(response) {
-          console.log(response);
-          var viewcount = response.items[0].liveStreamingDetails.concurrentViewers;
-          document.getElementById("author").innerText += " / " + viewcount + " watching";
-        });
+    function getViewcount(videoID) {
+      if(!videoID) {
+      	return 0;
       }
+      var request = gapi.client.youtube.videos.list({
+        id: videoID,
+        part: 'liveStreamingDetails',
+      });
+      request.execute(function(response) {
+        console.log(response);
+        var viewcount = response.items[0].liveStreamingDetails.concurrentViewers;
+        if(!viewcount) {
+      	  viewcount = 0;
+        }
+        return viewcount;
+      });
     }
     
     //Update metadata about currently playing video
     function updateMetadata() {
       document.getElementById("title").innerText = player.getVideoData().title;
-      document.getElementById("author").innerText = player.getVideoData().author;
-      updateViewcount(player.getVideoData().video_id);
+      document.getElementById("author").innerText = player.getVideoData().author + " / " + getViewcount() + " watching";
     }
     
     function reloadPlaylist() {
