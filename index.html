@@ -14,7 +14,7 @@
       color: white;
       font-weight: bold;
       background-color: black;
-			text-shadow: 0px 0px 30px #000;
+	    text-shadow: 0px 0px 30px #000;
     }
     
     #livebadge {
@@ -100,9 +100,8 @@
       gapi.client.setApiKey(apiKey);
       gapi.client.load('youtube', 'v3', function() {
         console.log("API loaded");
+        setupPlayer();
       });
-      
-      setupPlayer();
     }
     
     function setupPlayer() {
