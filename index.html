@@ -148,7 +148,7 @@
     //Update metadata about currently playing video
     function updateMetadata() {
       document.getElementById("title").innerText = player.getVideoData().title;
-      document.getElementById("author").innerText = player.getVideoData().author + " / " + getViewcount() + " watching";
+      document.getElementById("author").innerText = player.getVideoData().author + " / " + getViewcount(player.getVideoData().video_id) + " watching";
     }
     
     function reloadPlaylist() {
