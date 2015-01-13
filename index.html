@@ -133,7 +133,7 @@
         request.execute(function(response) {
           console.log(response);
           var viewcount = response.items[0].liveStreamingDetails.concurrentViewers;
-          document.getElementById("viewcount").innerText = viewcount + " watching";
+          document.getElementById("author").innerText += " / " + viewcount + " watching";
         });
       }
     }
