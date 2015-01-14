@@ -81,7 +81,7 @@
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     
     var player;
-    var playlists = Array("PLiCvVJzBupKmEehQ3hnNbbfBjLUyvGlqx", "PLZKuf2oBY67hyDlNycziuY8y58fZvncBp", "PLLbJ27RDXU830wzgieQn1JTs97mGuBIc6");
+    var playlists = Array("PLiCvVJzBupKmEehQ3hnNbbfBjLUyvGlqx", "PLZKuf2oBY67hyDlNycziuY8y58fZvncBp", "PLLbJ27RDXU830wzgieQn1JTs97mGuBIc6", "PLr8KIbGK44Lt32O5gDf-9WgLqrdGUUSf_");
     var currentPlaylist = 0;
     
     function onYouTubeIframeAPIReady() {
@@ -166,7 +166,11 @@
         //If we got to the end, refresh the playlist
         if(player.getPlaylistIndex() >= listLen - 1) {
           //Also, choose a random new playlist
-          currentPlaylist = Math.floor(Math.random()*playlists.length);
+          currentPlaylist = currentPlaylist + 1;
+          if(currentPlaylist >= playlists.length) {
+          	currentPlaylist = 0;
+          }
+          //currentPlaylist = Math.floor(Math.random()*playlists.length);
           
           reloadPlaylist();
         }
