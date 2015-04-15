@@ -11,48 +11,87 @@
 		body {
 			background: #222;
 			color: #aaa;
+			font-family: Arial, sans-serif;
 		}
 
 		a {
 			color: #eeaaaa;
 			text-decoration: none;
 		}
-
-		div.video {
-			width: 320;
-			height: 250;
-			float: left;
-			margin: 10px;
+		
+		#playerContainer {
+			width: 100%;
+			text-align: center;
+			margin-top: 10px;
 			margin-bottom: 15px;
-			position: relative;
 		}
 
-		div.video img {
-			margin-bottom: 10px;
+		#player {
+			margin-left: auto;
+			margin-right: auto;
+		}
+		
+		div.video {
+			width: 320;
+			height: 180;
+			float: left;
+			margin: 10px;
+			position: relative;
+			margin-bottom: 15px;
 		}
 
 		span.viewcount {
-			background: #222;
+			background: #111;
 			color: #ff4444;
 			position: absolute;
 			top: 5px;
 			left: 5px;
 			padding: 5px;
+			font-size: 12px;
+		}
+		
+		span.title {
+			background: #111;
+			color: #eee;
+			position: absolute;
+			top: 130px;
+			left: 5px;
+			max-width: 300px;
+			padding: 5px;
+			font-size: 14px;
 		}
 
-		div.video p {
-			margin-bottom: 5px;
+		span.channel {
+			background: #111;
+			color: #eee;
+			position: absolute;
+			top: 110px;
+			left: 5px;
+			max-width: 300px;
+			padding: 5px;
+			font-size: 12px;
 		}
   </style>
 
   <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
 </head>
 <body>
+	<div id="playerContainer">
+		<div id="player"></div>
+	</div>
+
 	<div id="streamList"></div>
 
   <script>
     var playlistID = "PLiCvVJzBupKmEehQ3hnNbbfBjLUyvGlqx";
     var apiKey = "AIzaSyCNKKxkfcuJG9UkijDfkZD0N0K7Kw_f35A";
+		var player;
+		var videoStarted = 0;
+		
+		var tag = document.createElement('script');
+		tag.src = "https://www.youtube.com/player_api";
+		var firstScriptTag = document.getElementsByTagName('script')[0];
+		firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 		window.onload = function() {
     	gapi.client.setApiKey(apiKey);
@@ -62,6 +101,10 @@
       	loadStreams();
     	})
 		};
+		
+		function onYouTubePlayerAPIReady() {
+			setupPlayer();
+		}
 
     //Fetch all top streams and display them on the page
     function loadStreams() {
@@ -85,9 +128,14 @@
 					newStream.className = 'video';
 					var videoURL = "https://www.youtube.com/watch?v=" + thisItem.resourceId.videoId;
 
-					newStream.innerHTML = '<span class="viewcount"></span> <a href="' + videoURL + '"><img src="' + thisItem.thumbnails.medium.url + '" width=320 height=180 /></a> <p class="title"><a href="' + videoURL + '">' + thisItem.title + '</a></p> <p class="channel"></p>';
+					newStream.innerHTML = '<span class="viewcount"></span> <span class="title"><a href="#" onclick="changeVideo(\'' + newStream.id + '\')">' + thisItem.title + '</a></span> <span class="channel"></span> <a href="#" onclick="changeVideo(\'' + newStream.id + '\')"><img src="' + thisItem.thumbnails.medium.url + '" width=320 height=180 /></a>';
 
 					streamList.appendChild(newStream);
+
+					if(videoStarted == 0) {
+						changeVideo(newStream.id);
+						videoStarted = 1;
+					}
 				}
 				
 				loadViewcounts();
@@ -116,9 +164,22 @@
 					}
 					var thisStream = document.getElementById(response.items[0].id);
 					thisStream.children[0].innerHTML = viewcount + " watching";
-					thisStream.children[3].innerHTML = response.items[0].snippet.channelTitle;
+					thisStream.children[2].innerHTML = response.items[0].snippet.channelTitle;
 				});
 			}
+		}
+
+		function setupPlayer() {
+			player = new YT.Player('player', {
+				height: 360,
+				width: 640,
+				videoId: ''
+				});
+		}
+
+		function changeVideo(videoID) {
+			console.log("loading video " + videoID);
+			player.loadVideoById(videoID);
 		}
   </script>
 </body>
