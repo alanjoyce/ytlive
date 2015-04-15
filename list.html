@@ -1,0 +1,121 @@
+<html>
+<head>
+  <title>YouTube Gaming Live Streams</title>
+
+  <style>
+    body, div, p, span, iframe {
+      margin: 0;
+      padding: 0;
+			background: #222;
+			color: #aaa;
+    }
+
+		a {
+			color: #eeaaaa;
+			text-decoration: none;
+		}
+
+		div.video {
+			width: 320;
+			height: 250;
+			float: left;
+			margin: 10px;
+			margin-bottom: 15px;
+			position: relative;
+		}
+
+		div.video img {
+			margin-bottom: 10px;
+		}
+
+		span.viewcount {
+			color: #ff4444;
+			position: absolute;
+			top: 5px;
+			left: 5px;
+			padding: 5px;
+		}
+
+		div.video p {
+			margin-bottom: 5px;
+		}
+  </style>
+
+  <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+</head>
+<body>
+	<div id="streamList"></div>
+
+  <script>
+    var playlistID = "PLiCvVJzBupKmEehQ3hnNbbfBjLUyvGlqx";
+    var apiKey = "AIzaSyCNKKxkfcuJG9UkijDfkZD0N0K7Kw_f35A";
+
+		window.onload = function() {
+    	gapi.client.setApiKey(apiKey);
+    	gapi.client.setApiKey(apiKey);
+    	gapi.client.load('youtube', 'v3', function() {
+      	console.log("API loaded");
+      	loadStreams();
+    	})
+		};
+
+    //Fetch all top streams and display them on the page
+    function loadStreams() {
+      var request = gapi.client.youtube.playlistItems.list({
+        playlistId: playlistID,
+        part: 'snippet',
+				maxResults: 50,
+      });
+      request.execute(function(response) {
+				var streamList = document.getElementById("streamList");
+        console.log("live playlist fetch: " + response);
+       	
+				streamList.innerHTML = "";
+
+				for (i = 0; i < response.items.length; i++) {
+					var thisItem = response.items[i].snippet;
+					//console.log(thisItem.title);
+
+					var newStream = document.createElement('div');
+					newStream.id = thisItem.resourceId.videoId;
+					newStream.className = 'video';
+					var videoURL = "https://www.youtube.com/watch?v=" + thisItem.resourceId.videoId;
+
+					newStream.innerHTML = '<span class="viewcount"></span> <a href="' + videoURL + '"><img src="' + thisItem.thumbnails.medium.url + '" width=320 height=180 /></a> <p class="title"><a href="' + videoURL + '">' + thisItem.title + '</a></p> <p class="channel"></p>';
+
+					streamList.appendChild(newStream);
+				}
+				
+				loadViewcounts();
+			
+				//Refresh this data every minute
+				setTimeout(loadStreams, 60000);
+			});
+    }
+
+		function loadViewcounts() {
+			//Get viewcounts
+			var streamList = document.getElementById("streamList");
+			for (i = 0; i < streamList.children.length; i++) {
+				var thisStream = streamList.children[i];
+				var videoID = thisStream.id;
+				//console.log(videoID);
+
+				var request = gapi.client.youtube.videos.list({
+					id: videoID,
+					part: 'liveStreamingDetails, snippet',
+				});
+				request.execute(function(response) {
+					var viewcount = response.items[0].liveStreamingDetails.concurrentViewers;
+					if(typeof viewcount == 'undefined') {
+						viewcount = '?';
+					}
+					var thisStream = document.getElementById(response.items[0].id);
+					thisStream.children[0].innerHTML = viewcount + " watching";
+					thisStream.children[3].innerHTML = response.items[0].snippet.channelTitle;
+				});
+			}
+		}
+  </script>
+</body>
+</html>
