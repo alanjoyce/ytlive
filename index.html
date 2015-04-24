@@ -46,6 +46,19 @@
       font-size: 24px;
       color: #bbb;
     }
+  	#moon {
+		content:url("./moon.png");
+		position: fixed;
+		bottom: -200px;
+		right: -125px;
+	}
+	#counter {
+		position: fixed;
+		bottom: 10px;
+		right: 20px;
+		color: red;
+		text-shadow: 2px 2px 2px white;
+	}
   </style>
   
   <script src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
@@ -56,7 +69,9 @@
   <div id="author"></div>
   <div id="viewcount"></div>
   <div id="player"></div>
-  
+  <div id="moon"></div>
+  <div id="counter">COUNT</div>
+
   <script>
     var pageHeight = Math.max(
       document.body.scrollHeight, document.documentElement.scrollHeight,
@@ -204,6 +219,50 @@
       
       nextVideo();
     }
+	function pad(number, length) {
+		var str = '' + number;
+		while (str.length < length) {
+			str = '0' + str;
+		}
+		return str;
+	}
+
+	// Adding in E3 timer countdown.
+	// Some ugly code I copied from stackoverflow...
+
+	var end = new Date('06/06/2015 12:00 AM');
+
+    var _second = 1000;
+    var _minute = _second * 60;
+    var _hour = _minute * 60;
+    var _day = _hour * 24;
+    var timer;
+
+    function showRemaining() {
+        var now = new Date();
+		var counterDiv = document.getElementById('counter');
+        var distance = end - now;
+        if (distance < 0) {
+
+            clearInterval(timer);
+            counterDiv.innerHTML = 'E3!';
+
+            return;
+        }
+        var days = pad(Math.floor(distance / _day), 2);
+        var hours = pad(Math.floor((distance % _day) / _hour), 2);
+        var minutes = pad(Math.floor((distance % _hour) / _minute), 2);
+        var seconds = pad(Math.floor((distance % _minute) / _second), 2);
+
+        counterDiv.innerHTML = days + ':';
+       	counterDiv.innerHTML += hours + ':';
+        counterDiv.innerHTML += minutes + ':';
+        counterDiv.innerHTML += seconds;
+    }
+
+    timer = setInterval(showRemaining, 1000);
+
+
   </script>
 </body>
 </html>
